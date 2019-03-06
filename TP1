@@ -1,0 +1,263 @@
+import cv2
+import numpy as np
+import matplotlib.pyplot as plt
+
+# _____________________________ Exercicio 1 _______________________________
+
+x_img = cv2.imread("..\images\lenac.tif")
+##cv2.imshow("Original Image", x_img)
+
+print("metodo dtype: " + str(x_img.dtype)) # uint8
+print("metodo shape: " + str(x_img.shape)) # (512, 512, 3)
+print()
+
+
+# _____________________________ Exercicio 2 _______________________________
+
+cv2.imwrite("file1.jpg", x_img, (cv2.IMWRITE_JPEG_QUALITY, 80))
+cv2.imwrite("file2.jpg", x_img, (cv2.IMWRITE_JPEG_QUALITY, 10))
+
+newFile = cv2.imread("file1.jpg")
+newFile2 = cv2.imread("file2.jpg")
+
+##cv2.imshow("Image 80 JPEG", newFile)
+##cv2.imshow("Image 10 JPEG", newFile2)
+
+
+x_img_1 = cv2.imread("file1.jpg")
+
+Ps1 = np.sum(x_img_1**2) # Potencia do sinal = Amplitude**2
+Pr1 = np.sum((x_img_1 - x_img)**2) # Potencia do ruido = desvio padrao
+# desvio padrao entre imagens -> MSE: mean squared error (desvio quadratico
+#medio) - sempre positivo, e valores proximos de zero são melhores.
+
+SNR1 = Ps1 / Pr1
+SNR1_dB = 10 * np.log(SNR1)
+
+
+x_img_2 = cv2.imread("file2.jpg")
+
+Ps2 = np.sum(x_img_2**2) 
+Pr2 = np.sum((x_img_2 - x_img)**2)
+SNR2 = Ps2 / Pr2
+SNR2_dB = 10 * np.log(SNR2)
+
+
+print("SNR da 1a imagem = " + str(SNR1))
+print("SNR da 2a imagem = " + str(SNR2))
+print("SNR em decibeis da 1a imagem = " + str(SNR1_dB))
+print("SNR em decibeis da 2a imagem = " + str(SNR2_dB))
+print()
+
+
+MAXi = np.max(x_img)
+L = len(x_img)
+C = len(x_img[0])
+
+MSE1 = Pr1 / (L*C)
+MSE2 = Pr2 / (L*C)
+
+PSNR1 = (MAXi**2) / MSE1
+PSNR2 = (MAXi**2) / MSE2
+
+PSNR1_dB = 10 * np.log(PSNR1)
+PSNR2_dB = 10 * np.log(PSNR2)
+
+print("PSNR da 1a imagem = " + str(PSNR1))
+print("PSNR da 2a imagem = " + str(PSNR2))
+print("PSNR em decibeis da 1a imagem = " + str(PSNR1_dB))
+print("PSNR em decibeis da 2a imagem = " + str(PSNR2_dB))
+print()
+
+
+# _____________________________ Exercicio 3 _______________________________
+
+x_img_g = cv2.cvtColor(x_img, cv2.COLOR_BGR2GRAY)
+#Y = R*299/1000+G*587/1000+B*114/1000
+#É um algoritmo de redução de luminosidade (color contrast)
+
+#cv2.imshow('Gray Image',x_img_g)
+cv2.imwrite('file3.bmp',x_img_g)
+
+
+
+# _____________________________ Exercicio 4 _______________________________
+
+#ravel transforma o array bidimensional da img num array 1D
+niveisCinzento = x_img_g.ravel()
+
+#np.unique devolve quantos niveis de cinzento a img tem
+niveis = np.unique(niveisCinzento)
+
+print("Numero de niveis de cinzento: " + str(len(niveis))) #215 niveis
+plt.hist(niveisCinzento, 256, [0, 256])
+#plt.show() 
+
+
+# _____________________________ Exercicio 5 _______________________________
+
+aux = np.array([128, 64, 32, 16, 8, 4, 2, 1])
+for i in range(len(aux)):
+    print(aux[i])
+    y = x_img_g > aux[i]
+##    cv2.imshow("BW" + str(i+1), y*1.0)
+    cv2.imwrite("BW" + str(i+1) + ".bmp", y*255)
+    
+##aux = np.array([128, 64, 32, 16, 8, 4, 2, 1])
+##for i in range(len(aux)):
+##    bit = np.bitwise_and(x_img_g, aux[i])
+##    y = bit > 0
+##    cv2.imshow("Bit"+ str(i+1), y*1.0)
+##    cv2.imwrite("Bit"+ str(i+1) + ".bmp", y*255) 
+
+'''
+# _____________________________ Exercicio 6 _______________________________
+
+aux2 = np.array([128, 64, 32, 16])
+bits4 = 0
+y = np.array([])
+for i in range(len(aux2)):  
+    bit = np.bitwise_and(x_img_g, aux2[i])
+    bits4 = bits4 + bit
+cv2.imshow("lena 4", bits4)
+cv2.imwrite("lena_4.bmp", bits4)
+
+'''
+
+# _____________________________ Exercicio 7 _______________________________
+
+#i = np.arange(-50, 50, 1)
+#z = np.zeros(100*100)
+## Create a black image
+#img = np.zeros((100,100,1), np.uint8)
+## Draw a diagonal blue line with thickness of 5 px
+##img = cv2.line(img,(0,0),(511,511),(255,0,0),5)
+#for n in range(len(i)):
+#    for k in range(len(i)):
+#        z[n*100 + k] = i[n] + i[k]*1j
+#        ang = np.angle(z[n*100 + k])
+#        if(i[n]%2 == 0):
+#            img = cv2.line(img,(i[n],i[k]),(i[len(i)-n-1],i[len(i)-n-1]),(0,0,0),1)
+#        else:
+#            img = cv2.line(img,(i[n],i[k]),(i[len(i)-n-1],i[len(i)-n-1]),(255,255,255),1)
+#  
+#cv2.imshow("imgblack", img)     
+
+def dither(Matriz_imagem):
+    
+    return image
+    
+y = dither(x_img_g)
+cv2.imwrite("lena_5.bmp", y)
+
+'''
+#Exercicio 7
+def drawAngledLines(angle):
+    rows = 225
+    cols = 225
+    img = np.zeros((rows,cols,3), np.int8)
+    drawLines = int(360/angle)
+    
+    for i in range(drawLines):
+        
+        x = int(rows/2  + rows  * np.cos( (i*angle) * np.pi / 180) )
+        y = int(cols/2 + cols * np.sin( (i*angle) * np.pi / 180) )
+        target = (x,y)
+       
+        if(i %2 == 0):
+            cv2.line(img, ( int(rows/2),int(cols/2) ),target,(0,0,0))
+        else: 
+            cv2.line(img, ( int(rows/2),int(cols/2) ),target,(255,255,255))
+            
+    cv2.imshow("angulo" + str(angle), img)
+    cv2.imwrite("NewAngulo" +str(angle)+'.bmp', img)
+    
+drawAngledLines(0.5)
+
+
+
+#Exercicio 8
+def dither(img):
+    rows,cols = img.shape
+
+    for x in range(1,rows-1):
+        for y in range(1,cols-1):
+                oldpixel = img[x][y]
+                
+                if(oldpixel > 127):
+                    newpixel = 255
+                else:
+                    newpixel = 0
+
+                img[x][y] = newpixel
+                quant_erro = oldpixel - newpixel
+                img[x+1][y] = img[x+1][y] + quant_erro * 7/16.
+                img[x][y+1] = img[x][y+1] + quant_erro * 5/16.
+                img[x+1][y+1] = img[x+1][y+1] + quant_erro * 1/16.
+                img[x-1][y+1] = img[x-1][y+1] + quant_erro * 3/16.
+
+    return np.clip(img,0,255)
+
+
+
+def floyd_steinberg_dither(data):
+ 
+    result = data.astype(np.float64)
+    
+    #matriz da difusao do erro
+    #np.nan(NotANumber, poor's man mask)
+    fs_matrix = np.array( (
+        ( np.nan, np.nan, 7/16 ),
+        ( 3/16, 5/16, 1/16),
+        ), dtype=np.float64 );
+    
+    #mascara
+    fs_mask = np.array( (
+        (False, False, True),
+        (True, True, True),
+        ), dtype=np.bool)
+ 
+    rows, cols = data.shape
+    for y in range(1,rows-1):
+        for x in range(1, cols-1):
+ 
+            val = result[y, x]
+            new_val = (val >= 127) and 255 or 0
+            error = val - new_val
+            result[y, x] = new_val
+            #???
+            view = result[y:y+2, x-1:x+2]
+            
+            new_view = view + error * fs_matrix
+            np.putmask(view, fs_mask, new_view)
+            
+    #formata os valores > 0 pa 0 e maiores que 255 pa 255
+    return np.clip(result, 0, 255).astype(np.uint8)
+
+ditherOc = dither(x_img_g)
+#dithering = floyd_steinberg_dither(x_img_g)
+
+#cv2.imshow("preto e branco", ditherOc)
+#cv2.imwrite("pretobranco.bmp", ditherOc)
+
+#cv2.imshow("preto e branco Copy", dithering)
+#cv2.imwrite("pretobrancoCopy.bmp", dithering)
+
+
+#Exercicio 9 
+
+# -1Kb que A imagem recebida
+#
+def arrayToBin(array):
+    print(array.shape)
+    print(array)
+    cv2.imshow("BW",array, cmap = plt.cm.binary)
+    #output = np.matrix(array)
+    #output.tofile("pretoebranco.bin")
+
+arrayToBin(ditherOc)
+
+'''
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()
